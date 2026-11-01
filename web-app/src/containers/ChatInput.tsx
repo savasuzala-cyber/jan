@@ -71,6 +71,7 @@ import { cancelAgentThreadBash, getSandboxStatus } from '@/lib/agentTools'
 import { useChatShell } from '@/hooks/useChatShell'
 import { useAssistant } from '@/hooks/useAssistant'
 import { AssistantSwitcher } from '@/containers/AssistantSwitcher'
+import { RoleplayButton } from '@/containers/RoleplayButton'
 import DropdownToolsAvailable from '@/containers/DropdownToolsAvailable'
 import { useServiceHub } from '@/hooks/useServiceHub'
 import { useTools } from '@/hooks/useTools'
@@ -2438,6 +2439,7 @@ const ChatInput = memo(function ChatInput({
                     updateCurrentThreadAssistant,
                   }}
                 />
+                {currentThread && <RoleplayButton thread={currentThread} />}
                 {showToolControls && hasJanBrowserMCPConfig && modelSupportsBrowser && (
                   <Tooltip>
                     <TooltipTrigger asChild>

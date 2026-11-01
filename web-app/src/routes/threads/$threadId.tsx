@@ -24,6 +24,7 @@ import {
   estimateConversationTokens,
 } from '@/lib/context-manager'
 import { renderInstructions } from '@/lib/instructionTemplate'
+import { combineSystemMessage } from '@/lib/roleplay'
 import {
   Conversation,
   ConversationContent,
@@ -436,9 +437,14 @@ function ThreadDetail() {
   // Get system message from thread's assistant instructions (if thread has an assigned assistant)
   // Only use assistant instructions if the thread was created with one (e.g., via a project)
   const threadAssistant = thread?.assistants?.[0]
-  const systemMessage = threadAssistant?.instructions
+  const baseSystemMessage = threadAssistant?.instructions
     ? renderInstructions(threadAssistant.instructions)
     : undefined
+  // Rol oyunu: aktif karakter varsa sistem mesajına eklenir
+  const systemMessage = combineSystemMessage(
+    baseSystemMessage,
+    thread?.metadata
+  )
 
   useEffect(() => {
     threadRef.current = thread
