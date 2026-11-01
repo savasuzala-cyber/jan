@@ -1,0 +1,19 @@
+name: Windows derlemesi (ozel surum)
+
+on:
+  push:
+    branches:
+      - lorebook-ozelligi
+  workflow_dispatch:
+
+concurrency:
+  group: build-windows-ozel
+  cancel-in-progress: true
+
+jobs:
+  build-windows-x64:
+    uses: ./.github/workflows/template-tauri-build-windows-x64-external.yml
+    with:
+      ref: refs/heads/lorebook-ozelligi
+      new_version: '0.8.8'
+      channel: stable

@@ -80,6 +80,7 @@ import { isPredefinedRemoteProvider } from '@/lib/providerCaps'
 import { PING_OPEN } from '@/lib/coworkPing'
 import { paramsSettings } from '@/lib/predefinedParams'
 import { CHAT_SLOT_ID } from '@/constants/models'
+import { prepareLorebook } from '@/lib/lorebook'
 import { createStepMetadata } from '@/lib/stepMetadata'
 
 export type TokenUsageCallback = (
@@ -869,6 +870,8 @@ export class CustomChatTransport implements ChatTransport<UIMessage> {
   private modelSupportsTools = false
   private ragFeatureAvailable = false
   protected systemMessage?: string
+  /** Etkin rol dosyasının metni (lorebook); her gönderimde yenilenir. */
+  protected lorebookBlock = ''
   protected serviceHub: ServiceHub | null
   protected threadId?: string
   private continueFromContent: ContinuationContent | null = null
@@ -991,6 +994,7 @@ export class CustomChatTransport implements ChatTransport<UIMessage> {
     const raw =
       [
         this.systemMessage,
+        this.lorebookBlock,
         this.buildMemorySystemInstruction(),
         this.buildFilesSystemInstruction(messages),
         this.buildWebSearchSystemInstruction(),
@@ -1449,6 +1453,9 @@ export class CustomChatTransport implements ChatTransport<UIMessage> {
 
     const inferenceParams = this.getActiveInferenceParams()
 
+
+    // Rol dosyası (#kod) varsa metnini hazırla; hata sohbeti durdurmaz.
+    this.lorebookBlock = await prepareLorebook(messagesToConvert)
 
     const effectiveSystem = this.buildSystemPrompt(messagesToConvert)
 

@@ -36,6 +36,7 @@ import { extractFilesFromPrompt, FileMetadata } from '@/lib/fileMetadata'
 import { Button } from '@/components/ui/button'
 import { PromptProgress } from '@/components/PromptProgress'
 import { useServiceHub } from '@/hooks/useServiceHub'
+import { useAssistant } from '@/hooks/useAssistant'
 import { useToolApprovalRequests } from '@/hooks/useToolApprovalRequests'
 import { parseCitationsFromToolOutput } from '@/lib/citation-parser'
 import type { RagCitation, WebCitation } from '@/components/Citations'
@@ -450,6 +451,17 @@ export const MessageItem = memo(
       return null
     }
 
+    // Show the assistant's picture beside its replies when the assistant has
+    // an image avatar (bundled '/images/...' or inline 'data:image/...').
+    const assistantAvatarRaw = useAssistant((s) => s.currentAssistant?.avatar)
+    const assistantName = useAssistant((s) => s.currentAssistant?.name)
+    const assistantAvatarImage =
+      typeof assistantAvatarRaw === 'string' &&
+      (assistantAvatarRaw.startsWith('data:image/') ||
+        assistantAvatarRaw.startsWith('/images/'))
+        ? assistantAvatarRaw
+        : undefined
+
     const renderedParts = useMemo(() => {
       const parts = message.parts as MessagePartLike[]
       const elements: React.ReactNode[] = []
@@ -571,6 +583,24 @@ export const MessageItem = memo(
           message.role === 'user' && !isFirstMessage && 'mt-8'
         )}
       >
+        {message.role === 'assistant' && assistantAvatarImage && (
+          <div
+            data-testid="assistant-avatar-row"
+            className="mb-2 flex items-center gap-2"
+          >
+            <img
+              src={assistantAvatarImage}
+              alt={assistantName ?? 'Assistant'}
+              className="size-10 shrink-0 rounded-full object-cover border border-border"
+            />
+            {assistantName && (
+              <span className="text-sm font-medium text-foreground">
+                {assistantName}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Render message parts. A turn alternates collapsed traces with
             answer paragraphs, and with no gap the two read as one block. */}
         <div className="flex flex-col gap-3">{renderedParts}</div>

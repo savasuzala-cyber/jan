@@ -1,10 +1,14 @@
 import React, { memo } from 'react'
 
 /**
- * Checks if an avatar is a custom image (starts with '/images/')
+ * Checks if an avatar is a custom image (bundled '/images/' path or an
+ * inline 'data:image/...' URL stored in the assistant file)
  */
 const isCustomImageAvatar = (avatar: React.ReactNode): avatar is string => {
-  return typeof avatar === 'string' && avatar.startsWith('/images/')
+  return (
+    typeof avatar === 'string' &&
+    (avatar.startsWith('/images/') || avatar.startsWith('data:image/'))
+  )
 }
 
 /**
